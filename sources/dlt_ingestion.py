@@ -22,15 +22,11 @@ def load_mongo_to_supabase():
         print("SUPABASE_DB_URL not set. Skipping.")
         return
 
-    # dlt uses specific env var naming for named pipelines to resolve credentials
-    # [PIPELINE_NAME]__DESTINATION__[DESTINATION_NAME]__CREDENTIALS
-    # We set this BEFORE initializing the pipeline
-    os.environ["GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS"] = db_url
-
     # Run the dlt pipeline
+    # We use an explicit destination with credentials to avoid resolution issues in GitHub Actions
     pipeline = dlt.pipeline(
         pipeline_name="gold_price_pipeline",
-        destination="postgres",
+        destination=dlt.destinations.postgres(credentials=db_url),
         dataset_name="gold_raw"
     )
 
