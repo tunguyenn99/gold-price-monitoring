@@ -113,8 +113,12 @@ chmod +x run_pipeline.sh
 
 ## 🛡️ Security & CI/CD
 
-> [![IMPORTANT IF YOU CLONE THIS REPO](https://img.shields.io/badge/IMPORTANT-Critical-red)]()
-> To ensure the **GitHub Actions** workflow runs successfully, you must add the following **GitHub Repository Secrets**:
+To ensure the **GitHub Actions** workflow runs successfully, you must add the following **GitHub Repository Secrets**. You can do this in two ways:
+
+### Option 1: Manual (Recommended)
+1. Go to your repository on GitHub.
+2. Navigate to **Settings** > **Secrets and variables** > **Actions**.
+3. Click **New repository secret** for each of the following:
 
 | Secret Name | Description |
 | :--- | :--- |
@@ -126,3 +130,24 @@ chmod +x run_pipeline.sh
 | `SUPABASE_DB_PORT` | Connection Port (6543) |
 
 ---
+
+### Option 2: Automated (via GitHub CLI)
+If your computer has the [GitHub CLI (`gh`)](https://cli.github.com/) installed, you can upload all secrets from your `.env` at once.
+
+**1. Install `gh` (if missing):**
+```bash
+sudo apt update && sudo apt install gh -y
+```
+
+**2. Authenticate:**
+```bash
+gh auth login
+```
+
+**3. Upload Secrets:**
+```bash
+grep -v '^#' .env | xargs -I {} gh secret set {}
+```
+
+---
+*Built with ❤️ for the Vietnam Data Engineering community.*

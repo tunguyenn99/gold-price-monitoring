@@ -25,7 +25,7 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: uv pip install requests beautifulsoup4 pymongo python-dotenv dnspython "dlt[postgres]" dbt-postgres pandas sqlalchemy --system
+        run: uv pip install requests beautifulsoup4 pymongo python-dotenv dnspython "dlt[postgres]" dbt-postgres pandas sqlalchemy matplotlib seaborn --system
 
       - name: 1. Run Scraper
         env:
@@ -53,8 +53,13 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python sources/analysis.py
 
-      - name: Commit and push tracking data
+      - name: 5. Generate Visual Charts
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python sources/visualize.py
+
+      - name: Commit and push tracking data & charts
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "data: update gold prices [bot]"
-          file_pattern: 'data/gold_prices.json'
+          commit_message: "data: update gold prices & charts [bot]"
+          file_pattern: 'data/gold_prices.json images/*.png'

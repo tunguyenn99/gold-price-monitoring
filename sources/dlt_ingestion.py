@@ -17,8 +17,17 @@ def load_mongo_to_supabase():
     db = client.get_database("gold_db")
     collection = db.get_collection("prices")
 
+    db_url = os.getenv("SUPABASE_DB_URL")
+    if not db_url:
+        print("SUPABASE_DB_URL not set. Skipping.")
+        return
+
+    # dlt uses specific env var naming for named pipelines to resolve credentials
+    # [PIPELINE_NAME]__DESTINATION__[DESTINATION_NAME]__CREDENTIALS
+    # We set this BEFORE initializing the pipeline
+    os.environ["GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS"] = db_url
+
     # Run the dlt pipeline
-    # We use the postgres destination which is compatible with Supabase
     pipeline = dlt.pipeline(
         pipeline_name="gold_price_pipeline",
         destination="postgres",
@@ -31,15 +40,6 @@ def load_mongo_to_supabase():
             # Convert ObjectId to string for Postgres compatibility
             doc["_id"] = str(doc["_id"])
             yield doc
-
-    # dlt uses DESTINATION__POSTGRES__CREDENTIALS for the connection string
-    # We map SUPABASE_DB_URL to this environment variable
-    db_url = os.getenv("SUPABASE_DB_URL")
-    if not db_url:
-        print("SUPABASE_DB_URL not set. Skipping.")
-        return
-        
-    os.environ["DESTINATION__POSTGRES__CREDENTIALS"] = db_url
 
     # Load data with merge strategy to avoid duplicates based on timestamp
     load_info = pipeline.run(
