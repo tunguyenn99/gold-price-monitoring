@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: gold_raw
+    schema: gold_raw
+    tables:
+      - name: raw_prices
+      - name: raw_prices__entries

@@ -1,0 +1,60 @@
+name: Gold Price Tracker
+
+on:
+  schedule:
+    - cron: '0 */2 * * *' # Runs every 2 hours
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+jobs:
+  modern_data_pipeline:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: uv pip install requests beautifulsoup4 pymongo python-dotenv dnspython "dlt[postgres]" dbt-postgres pandas sqlalchemy --system
+
+      - name: 1. Run Scraper
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: python sources/scraper.py
+
+      - name: 2. Run dlt Ingestion (Mongo -> Supabase)
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python sources/dlt_ingestion.py
+
+      - name: 3. Run dbt Transformations
+        env:
+          SUPABASE_DB_HOST: ${{ secrets.SUPABASE_DB_HOST }}
+          SUPABASE_DB_USER: ${{ secrets.SUPABASE_DB_USER }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_DB_PORT: ${{ secrets.SUPABASE_DB_PORT }}
+        run: |
+          cd dbt_project
+          dbt run --profiles-dir .
+
+      - name: 4. Run Analysis
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python sources/analysis.py
+
+      - name: Commit and push tracking data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "data: update gold prices [bot]"
+          file_pattern: 'data/gold_prices.json'
