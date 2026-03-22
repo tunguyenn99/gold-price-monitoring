@@ -150,4 +150,10 @@ grep -v '^#' .env | xargs -I {} gh secret set {}
 ```
 
 ---
-*Built with ❤️ for the Vietnam Data Engineering community.*
+
+### 🤝 Connect & Community
+
+* **Author**: [Tu Nguyen](https://www.linkedin.com/in/tunguyenn99/)
+* **Community**: Join the [Xom Data](https://www.facebook.com/groups/xomdata/) community for more data analytics engineering insights!
+
+*Built with ❤️ for the **Xom Data** community.*
