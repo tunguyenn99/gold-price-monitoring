@@ -98,7 +98,7 @@ def generate_gold_charts():
             
             # Use a more vibrant palette for trends
             num_brands = len(df_daily['brand'].unique())
-            palette = sns.color_palette("viridis", n_colors=num_brands)
+            palette = sns.color_palette("Set1", n_colors=num_brands)
             
             # Plot trends for each brand
             ax2 = sns.lineplot(

@@ -1,9 +1,9 @@
 with parent as (
-    select * from {{ source('gold_raw', 'raw_prices') }}
+    select * from {{ source('gold_raw', 'prices') }}
 ),
 child as (
     -- dlt by default flattens nested lists into child tables with __entries suffix
-    select * from {{ source('gold_raw', 'raw_prices__entries') }}
+    select * from {{ source('gold_raw', 'prices__entries') }}
 ),
 joined as (
     select

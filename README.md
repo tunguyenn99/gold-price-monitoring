@@ -8,31 +8,7 @@ A professional, end-to-end data pipeline for monitoring and analyzing gold price
 
 This project follows a linear, automated pipeline from raw data collection to final business intelligence:
 
-```yml
-🌍 24h.com.vn (Website)
-       |
-       | [Scrape: BeautifulSoup4/Requests]
-       v
-🍃 MongoDB Atlas (Raw Landing Zone)
-       |
-       | [Ingest: dlt (Data Load Tool)]
-       v
-💎 Supabase / Postgres (Data Warehouse)
-       |
-       +--- [Transform: dbt (Medallion Architecture)] ---+
-       |                                                 |
-       |   (stg_gold_prices) ------> (fct_gold_prices)   |
-       |                                                 |
-       +-----------------------+-------------------------+
-                               |
-                               | [Analysis: Pandas/Seaborn]
-                               v
-📊 Matplotlib Charts (Images Generation)
-       |
-       | [Orchestrate: GitHub Actions]
-       v
-🖥️ GitHub Repository (Final Insights)
-```
+![Project Architecture](images/project_architecture.png)
 
 ---
 
@@ -57,6 +33,21 @@ The gold market in Vietnam is known for its **extreme volatility**. This project
 
 ---
 
+## 📸 Pipeline Execution Logs & Data
+
+Here are snapshots showing the pipeline running successfully in production:
+
+### Orchestration (GitHub Actions)
+![GitHub Actions Output](images/output_gha.png)
+
+### Raw Storage (MongoDB Atlas)
+![MongoDB Atlas Log](images/output_mongo.png)
+
+### Data Warehouse (Supabase Postgres)
+![Supabase Output](images/output_supabase.png)
+
+---
+
 ## 🛠️ Tech Stack Details
 
 | Stage | Tool | Description |
@@ -78,11 +69,12 @@ gold-price-monitoring/
 ├── .github/workflows/    # CI/CD Automation (GitHub Actions)
 ├── dbt_project/          # dbt Models, Seeds & Configs
 ├── images/               # Generated Analytics & Visualization Charts
+├── excalidraw/           # Architecture diagrams and generators
 ├── sources/              # Core Python Processing Scripts
-│   ├── scraper.py        # Web Scraper Engine
-│   ├── dlt_ingestion.py  # Mongo -> Supabase Ingestion Logic
-│   ├── visualize.py      # Automated Chart Generator
-│   └── analysis.py       # Trend & Statistical Analytics
+│   ├── scraper/          # Web Scraper Engine (scraper.py)
+│   ├── dlt/              # Data Loading (dlt_ingestion.py & mongodb_pipeline.py)
+│   ├── mongodb/          # MongoDB utilities and configuration
+│   └── utils/            # Analytics and tools (analysis.py & visualize.py)
 ├── data/                 # Local Data Backups (CSV/JSON)
 └── run_pipeline.sh       # Local Execution Entry point
 ```
