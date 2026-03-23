@@ -1,4 +1,5 @@
 import dlt
+from dlt.destinations import postgres
 import os
 import sys
 from dotenv import load_dotenv
@@ -22,10 +23,10 @@ def load_mongo_to_supabase():
         return
 
     # Run the dlt pipeline
-    # We pass credentials explicitly to ensure dlt finds them regardless of naming
+    # We use an explicit destination object to ensure high-precedence configuration
     pipeline = dlt.pipeline(
         pipeline_name="gold_price_pipeline",
-        destination="postgres",
+        destination=postgres(credentials=supabase_url),
         dataset_name="gold_raw"
     )
 
@@ -44,7 +45,6 @@ def load_mongo_to_supabase():
     # Load data with merge strategy to avoid duplicates based on timestamp
     load_info = pipeline.run(
         source, 
-        credentials=supabase_url,
         write_disposition="merge"
     )
     print(load_info)

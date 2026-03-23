@@ -36,7 +36,7 @@ jobs:
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          DESTINATION__POSTGRES__CREDENTIALS: ${{ secrets.SUPABASE_DB_URL }}
+          GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS: ${{ secrets.SUPABASE_DB_URL }}
         run: python sources/dlt_ingestion.py
 
       - name: 3. Run dbt Transformations
