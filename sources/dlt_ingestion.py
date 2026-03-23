@@ -1,7 +1,10 @@
 import dlt
-from pymongo import MongoClient
 import os
+import sys
 from dotenv import load_dotenv
+
+# Add the project root to sys.path to allow importing the 'mongodb' source
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 load_dotenv()
 
@@ -13,36 +16,36 @@ def load_mongo_to_supabase():
         print("MONGO_URI not set. Skipping.")
         return
         
-    client = MongoClient(mongo_uri)
-    db = client.get_database("gold_db")
-    collection = db.get_collection("prices")
-
-    db_url = os.getenv("SUPABASE_DB_URL")
-    if not db_url:
+    supabase_url = os.getenv("SUPABASE_DB_URL")
+    if not supabase_url:
         print("SUPABASE_DB_URL not set. Skipping.")
         return
 
     # Run the dlt pipeline
-    # We use 'postgres' as the destination; dlt will resolve credentials from the environment
+    # We pass credentials explicitly to ensure dlt finds them regardless of naming
     pipeline = dlt.pipeline(
         pipeline_name="gold_price_pipeline",
         destination="postgres",
         dataset_name="gold_raw"
     )
 
-    # Source data generator
-    def get_data():
-        for doc in collection.find():
-            # Convert ObjectId to string for Postgres compatibility
-            doc["_id"] = str(doc["_id"])
-            yield doc
+    try:
+        from mongodb import mongodb
+    except ImportError:
+        from sources.mongodb import mongodb
+
+    # Use the built-in mongodb source
+    source = mongodb(
+        connection_url=mongo_uri,
+        database="gold_db",
+        collection_names=["prices"]
+    )
 
     # Load data with merge strategy to avoid duplicates based on timestamp
     load_info = pipeline.run(
-        get_data(), 
-        table_name="raw_prices", 
-        write_disposition="merge", 
-        primary_key="timestamp"
+        source, 
+        credentials=supabase_url,
+        write_disposition="merge"
     )
     print(load_info)
 

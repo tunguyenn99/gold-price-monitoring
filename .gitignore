@@ -10,3 +10,4 @@ ENV/
 
 # Environment
 .env
+.dlt/

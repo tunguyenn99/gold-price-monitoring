@@ -1,0 +1,2 @@
+pymongo>=3
+dlt[postgres]>=0.5.1
