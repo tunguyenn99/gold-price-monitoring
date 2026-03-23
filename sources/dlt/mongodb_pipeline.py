@@ -4,12 +4,17 @@ from dlt.common.data_writers import TDataItemFormat
 from dlt.common.pipeline import LoadInfo
 from dlt.common.typing import TDataItems
 from dlt.pipeline.pipeline import Pipeline
+import os
+import sys
+
+# Add the project root to sys.path to allow importing 'sources.mongodb'
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 # As this pipeline can be run as standalone script or as part of the tests, we need to handle the import differently.
 try:
-    from .mongodb import mongodb, mongodb_collection  # type: ignore
+    from sources.mongodb import mongodb, mongodb_collection  # type: ignore
 except ImportError:
-    from mongodb import mongodb, mongodb_collection
+    from sources.mongodb import mongodb, mongodb_collection
 
 
 def load_select_collection_db(pipeline: Pipeline = None) -> LoadInfo:

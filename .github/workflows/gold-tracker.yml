@@ -30,7 +30,7 @@ jobs:
       - name: 1. Run Scraper
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
-        run: python sources/scraper.py
+        run: python sources/scraper/scraper.py
 
       - name: 2. Run dlt Ingestion (Mongo -> Supabase)
         env:
@@ -42,7 +42,7 @@ jobs:
           GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS__USERNAME: ${{ secrets.SUPABASE_DB_USER }}
           GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS__HOST: ${{ secrets.SUPABASE_DB_HOST }}
           GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS__PORT: ${{ secrets.SUPABASE_DB_PORT }}
-        run: python sources/dlt_ingestion.py
+        run: python sources/dlt/dlt_ingestion.py
 
       - name: 3. Run dbt Transformations
         env:
@@ -57,12 +57,12 @@ jobs:
       - name: 4. Run Analysis
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: python sources/analysis.py
+        run: python sources/utils/analysis.py
 
       - name: 5. Generate Visual Charts
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: python sources/visualize.py
+        run: python sources/utils/visualize.py
 
       - name: Commit and push tracking data & charts
         uses: stefanzweifel/git-auto-commit-action@v5
