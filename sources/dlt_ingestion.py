@@ -23,10 +23,10 @@ def load_mongo_to_supabase():
         return
 
     # Run the dlt pipeline
-    # We use an explicit destination with credentials to avoid resolution issues in GitHub Actions
+    # We use 'postgres' as the destination; dlt will resolve credentials from the environment
     pipeline = dlt.pipeline(
         pipeline_name="gold_price_pipeline",
-        destination=dlt.destinations.postgres(credentials=db_url),
+        destination="postgres",
         dataset_name="gold_raw"
     )
 
