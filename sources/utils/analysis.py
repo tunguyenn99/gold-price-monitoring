@@ -18,7 +18,7 @@ def analyze_gold_prices():
         
         # Query the dbt fact table from the gold_marts schema
         # We assume dbt has run and created this table
-        query = "SELECT * FROM gold_marts.fct_gold_prices ORDER BY price_date DESC"
+        query = "SELECT * FROM gold_marts.fct_gold_prices ORDER BY price_hour DESC"
         df = pd.read_sql(query, engine)
         
         if df.empty:
@@ -30,11 +30,11 @@ def analyze_gold_prices():
         print("="*40)
         
         # Show top 5 recent entries
-        print("\n--- Recent Daily Averages ---")
+        print("\n--- Recent Hourly Averages ---")
         print(df.head(10))
         
-        # Price Comparison: Today vs Yesterday for SJC
-        sjc_df = df[df['brand'] == 'SJC'].sort_values('price_date', ascending=False)
+        # Price Comparison: Latest vs Previous Hour for SJC
+        sjc_df = df[df['brand'] == 'SJC'].sort_values('price_hour', ascending=False)
         if len(sjc_df) >= 2:
             today = sjc_df.iloc[0]
             yesterday = sjc_df.iloc[1]
@@ -45,7 +45,7 @@ def analyze_gold_prices():
             status = "📈 UP" if diff_sell > 0 else "📉 DOWN" if diff_sell < 0 else "➡️ STABLE"
             
             print(f"\n[SJC BRAND COMPARISON]")
-            print(f"Date: {today['price_date']} vs {yesterday['price_date']}")
+            print(f"Time: {today['price_hour']} vs {yesterday['price_hour']}")
             print(f"Status: {status}")
             print(f"Sell Price Change: {diff_sell:,.0f} VND ({percent_sell:+.2f}%)")
             print(f"Current Avg Sell: {today['avg_sell_price']:,.0f} VND")

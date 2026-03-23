@@ -11,10 +11,10 @@
     with staging as (
     select * from "postgres"."gold_marts"."stg_gold_prices"
 ),
-daily_metrics as (
+hourly_metrics as (
     select
         brand,
-        price_date,
+        date_trunc('hour', price_timestamp) as price_hour,
         avg(buy_price) as avg_buy_price,
         avg(sell_price) as avg_sell_price,
         min(buy_price) as min_buy_price,
@@ -23,6 +23,6 @@ daily_metrics as (
     from staging
     group by 1, 2
 )
-select * from daily_metrics
+select * from hourly_metrics
   );
   

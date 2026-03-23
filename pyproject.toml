@@ -1,0 +1,25 @@
+[project]
+name = "gold-price-monitoring"
+version = "0.1.0"
+description = "Vietnam Gold Price Monitor - Modern Data Stack"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4",
+    "requests",
+    "dlt[postgres,mongodb]",
+    "dbt-core",
+    "dbt-postgres",
+    "pandas",
+    "python-dotenv",
+    "matplotlib",
+    "seaborn",
+    "sqlalchemy",
+    "psycopg2-binary",
+    "pymongo",
+    "dnspython"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

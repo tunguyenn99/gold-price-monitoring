@@ -90,20 +90,20 @@ def generate_gold_charts():
 
         # --- CHART 2: Historical Price Trends ---
         print("\nGenerating Premium Historical Price Trends chart...")
-        query_daily = "SELECT * FROM gold_marts.fct_gold_prices ORDER BY price_date"
-        df_daily = pd.read_sql(query_daily, engine)
+        query_hourly = "SELECT * FROM gold_marts.fct_gold_prices ORDER BY price_hour"
+        df_hourly = pd.read_sql(query_hourly, engine)
         
-        if not df_daily.empty:
+        if not df_hourly.empty:
             plt.figure(figsize=(14, 8))
             
             # Use a more vibrant palette for trends
-            num_brands = len(df_daily['brand'].unique())
+            num_brands = len(df_hourly['brand'].unique())
             palette = sns.color_palette("Set1", n_colors=num_brands)
             
             # Plot trends for each brand
             ax2 = sns.lineplot(
-                data=df_daily, 
-                x='price_date', 
+                data=df_hourly, 
+                x='price_hour', 
                 y='avg_sell_price', 
                 hue='brand', 
                 marker='o', 
@@ -113,17 +113,17 @@ def generate_gold_charts():
             )
             
             # Add data labels to line points sparingly (only if meaningful)
-            if len(df_daily) < 20: # Avoid clutter
+            if len(df_hourly) < 20: # Avoid clutter
                 for line in ax2.lines:
                     xdata = line.get_xdata()
                     ydata = line.get_ydata()
                     for x, y in zip(xdata, ydata):
                         ax2.annotate(f'{int(y):,}', (x, y), textcoords="offset points", xytext=(0,10), ha='center', fontsize=9, weight='bold')
 
-            plt.title('Daily Gold Sell Price Trends (Average per Day)', fontsize=20, weight='bold', color='#333')
+            plt.title('Hourly Gold Sell Price Trends (Average per Hour)', fontsize=20, weight='bold', color='#333')
             plt.ylabel('Avg Sell Price (Thousand VND / Lượng)', fontsize=14)
-            plt.xlabel('Date', fontsize=14)
-            plt.xticks(rotation=0) # Better with horizontal bars above
+            plt.xlabel('Time (Hourly)', fontsize=14)
+            plt.xticks(rotation=45) # Rotate hourly labels to prevent overlap
             
             # Format y-axis
             ax2.yaxis.set_major_formatter(FuncFormatter(format_currency))
