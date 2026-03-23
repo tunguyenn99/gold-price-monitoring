@@ -5,7 +5,7 @@ gold_price_profile:
       host: "{{ env_var('SUPABASE_DB_HOST') }}"
       user: "{{ env_var('SUPABASE_DB_USER') }}"
       password: "{{ env_var('SUPABASE_DB_PASSWORD') }}"
-      port: "{{ env_var('SUPABASE_DB_PORT', 5432) | int }}"
+      port: "{{ env_var('SUPABASE_DB_PORT', 6543) | int }}"
       dbname: postgres
       schema: gold_marts
       threads: 4
