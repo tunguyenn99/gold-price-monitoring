@@ -17,16 +17,23 @@ def load_mongo_to_supabase():
         print("MONGO_URI not set. Skipping.")
         return
         
+    # Destination credentials
+    # We prioritize SUPABASE_DB_URL but also support individual components
     supabase_url = os.getenv("SUPABASE_DB_URL")
-    if not supabase_url:
-        print("SUPABASE_DB_URL not set. Skipping.")
-        return
-
+    
     # Run the dlt pipeline
-    # We use an explicit destination object to ensure high-precedence configuration
+    # We use an explicit destination object if the URL is provided
+    # otherwise we let dlt resolve from individual env vars
+    destination = "postgres"
+    if supabase_url:
+        print(f"Using provided SUPABASE_DB_URL for destination.")
+        destination = postgres(credentials=supabase_url)
+    else:
+        print("SUPABASE_DB_URL not found. dlt will attempt to resolve from GOLD_PRICE_PIPELINE__ environment variables.")
+
     pipeline = dlt.pipeline(
         pipeline_name="gold_price_pipeline",
-        destination=postgres(credentials=supabase_url),
+        destination=destination,
         dataset_name="gold_raw"
     )
 
@@ -42,12 +49,17 @@ def load_mongo_to_supabase():
         collection_names=["prices"]
     )
 
-    # Load data with merge strategy to avoid duplicates based on timestamp
-    load_info = pipeline.run(
-        source, 
-        write_disposition="merge"
-    )
-    print(load_info)
+    print(f"Starting pipeline run for {pipeline.pipeline_name}...")
+    try:
+        # Load data with merge strategy to avoid duplicates based on timestamp
+        load_info = pipeline.run(
+            source, 
+            write_disposition="merge"
+        )
+        print(load_info)
+    except Exception as e:
+        print(f"Pipeline run failed: {e}")
+        raise
 
 if __name__ == "__main__":
     load_mongo_to_supabase()

@@ -36,7 +36,12 @@ jobs:
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS: ${{ secrets.SUPABASE_DB_URL }}
+          # Explicit dlt credentials for named pipeline
+          GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS__DATABASE: ${{ secrets.SUPABASE_DB_NAME }}
+          GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS__PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS__USERNAME: ${{ secrets.SUPABASE_DB_USER }}
+          GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS__HOST: ${{ secrets.SUPABASE_DB_HOST }}
+          GOLD_PRICE_PIPELINE__DESTINATION__POSTGRES__CREDENTIALS__PORT: ${{ secrets.SUPABASE_DB_PORT }}
         run: python sources/dlt_ingestion.py
 
       - name: 3. Run dbt Transformations
