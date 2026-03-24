@@ -2,7 +2,8 @@ name: Gold Price Tracker
 
 on:
   schedule:
-    - cron: '0 8,12,16,20 * * *' # Runs at 8 AM, 12 PM, 4 PM, 8 PM
+    # 8h VN = 1h UTC | 12h VN = 5h UTC | 16h VN = 9h UTC | 20h VN = 13h UTC
+    - cron: '0 1,5,9,13 * * *' 
   workflow_dispatch: # Allows manual triggering from the Actions tab
 
 jobs:
