@@ -19,8 +19,6 @@ joined as (
         c.sell::numeric as sell_price
     from parent p
     join child c on p._dlt_id = c._dlt_parent_id
-    where c.buy::numeric > 0 and c.buy::numeric < 5000000
-      and c.sell::numeric > 0 and c.sell::numeric < 5000000
 )
 select * from joined
   );

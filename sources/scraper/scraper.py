@@ -12,7 +12,7 @@ load_dotenv()
 
 def sanitize_price(price_str):
     """Extracts numeric value from price string."""
-    # Remove all non-digit characters (including dots and commas used as separators)
+    # Xóa tất cả ký tự không phải số (bao gồm dấu phẩy, dấu chấm và phần tăng giảm)
     digits = re.sub(r'\D', '', price_str)
     if digits:
         return int(digits)
@@ -32,25 +32,35 @@ def scrape_gold_prices():
         return None
     
     soup = BeautifulSoup(response.content, "html.parser")
-    table_container = soup.find("div", class_="tabBody")
+    # Tìm trực tiếp bảng chứa dữ liệu dựa trên class từ HTML bạn cung cấp
+    table_container = soup.find("table", class_="gia-vang-search-data-table")
     if not table_container:
         print("Could not find gold price table container.")
         return None
     
     rows = table_container.find_all("tr")
     data = []
-    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     for row in rows:
         cols = row.find_all("td")
+        
+        # Dựa trên HTML:
+        # cols[0] -> Thương hiệu (SJC, DOJI...)
+        # cols[1] -> Giá mua hôm nay (Chứa span.fixW và span.colorGreen)
+        # cols[2] -> Giá bán hôm nay (Chứa span.fixW và span.colorGreen)
+        # cols[3], [4] -> Giá hôm qua (không lấy)
         if len(cols) >= 3:
-            # First row is usually header
-            if "Loại vàng" in cols[0].get_text():
-                continue
-                
-            brand = cols[0].get_text(strip=True)
-            buy_raw = cols[1].get_text(strip=True)
-            sell_raw = cols[2].get_text(strip=True)
+            # Lấy tên brand từ thẻ h2 bên trong td đầu tiên
+            brand_node = cols[0].find("h2")
+            brand = brand_node.get_text(strip=True) if brand_node else cols[0].get_text(strip=True)
+            
+            # QUAN TRỌNG: Chỉ lấy text trong <span class="fixW"> để tránh bị dính số tăng giảm
+            buy_node = cols[1].find("span", class_="fixW")
+            sell_node = cols[2].find("span", class_="fixW")
+            
+            # Nếu tìm thấy thẻ span.fixW thì lấy text của nó, nếu không lấy toàn bộ text của td
+            buy_raw = buy_node.get_text(strip=True) if buy_node else cols[1].get_text(strip=True)
+            sell_raw = sell_node.get_text(strip=True) if sell_node else cols[2].get_text(strip=True)
             
             buy_price = sanitize_price(buy_raw)
             sell_price = sanitize_price(sell_raw)
@@ -61,7 +71,6 @@ def scrape_gold_prices():
                     "buy": buy_price,
                     "sell": sell_price
                 })
-                
     return data
 
 def save_to_json(new_entries):
@@ -76,13 +85,7 @@ def save_to_json(new_entries):
             except json.JSONDecodeError:
                 history = []
     
-    # Check if we already have an entry for today (to avoid duplicates if run multiple times)
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
-    
-    # We will store daily records. If run multiple times a day, we can either:
-    # 1. Update the record for today
-    # 2. Add as a new entry with timestamp
-    # Let's go with timestamped records for better granularity
     
     history.append({
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -90,7 +93,6 @@ def save_to_json(new_entries):
         "entries": new_entries
     })
     
-    # Keep only the last 365 records to avoid massive file size
     if isinstance(history, list) and len(history) > 365:
         history = history[-365:]
         
@@ -98,14 +100,12 @@ def save_to_json(new_entries):
         json.dump(history, f, ensure_ascii=False, indent=4)
 
 def save_to_mongodb(new_entries):
-    """Uploads the scraped data to MongoDB Atlas."""
     mongo_uri = os.getenv("MONGO_URI")
     if not mongo_uri:
-        print("MONGO_URI not found in environment variables. Skipping MongoDB upload.")
+        print("MONGO_URI not found. Skipping MongoDB upload.")
         return
     
     try:
-        # Connect to MongoDB Atlas
         client = MongoClient(mongo_uri)
         db = client.get_database("gold_db")
         collection = db.get_collection("prices")
@@ -116,9 +116,8 @@ def save_to_mongodb(new_entries):
             "entries": new_entries
         }
         
-        # Insert the daily snapshot
         result = collection.insert_one(document)
-        print(f"Successfully uploaded to MongoDB Atlas. Document ID: {result.inserted_id}")
+        print(f"Uploaded to MongoDB. ID: {result.inserted_id}")
         client.close()
     except Exception as e:
         print(f"Error uploading to MongoDB: {e}")
@@ -126,12 +125,8 @@ def save_to_mongodb(new_entries):
 if __name__ == "__main__":
     prices = scrape_gold_prices()
     if prices:
-        # Save to local JSON for dashboard (fallback/static version)
         save_to_json(prices)
-        
-        # Save to MongoDB Atlas (cloud storage)
         save_to_mongodb(prices)
-        
         print(f"Workflow completed successfully.")
     else:
         print("No data scraped.")
