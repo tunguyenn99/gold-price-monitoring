@@ -9,9 +9,10 @@ from matplotlib.ticker import FuncFormatter
 # Load credentials from .env
 load_dotenv()
 
-def format_currency(x, p):
-    """Formats value as currency with comma separators."""
-    return f"{int(x):,}"
+def format_to_millions(x, p):
+    """Formats values into Millions (M) (e.g., 171.5 M)."""
+    # Assumes input x is in Thousand VND. Divide by 1000 to get Millions.
+    return f"{x/1000:.1f} M"
 
 def generate_gold_charts():
     """Fetches data from Supabase and generates gold price visualization charts with premium aesthetics."""
@@ -20,9 +21,7 @@ def generate_gold_charts():
         print("Error: SUPABASE_DB_URL not found in .env")
         return
 
-    # Use relative path for repository compatibility
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Go up two levels: from sources/utils to root
     project_root = os.path.dirname(os.path.dirname(script_dir))
     output_dir = os.path.join(project_root, "images")
     os.makedirs(output_dir, exist_ok=True)
@@ -32,13 +31,12 @@ def generate_gold_charts():
         engine = create_engine(db_url)
         
         # Set premium theme
-        sns.set_theme(style="darkgrid", palette="muted")
+        sns.set_theme(style="whitegrid")
         plt.rcParams['font.family'] = 'sans-serif'
-        plt.rcParams['axes.titlepad'] = 20
-        plt.rcParams['axes.labelpad'] = 15
+        plt.rcParams['axes.titlepad'] = 25
 
-        # --- CHART 1: Current Price Comparison (Latest Snapshot) ---
-        print("\nGenerating Premium Current Price Comparison chart (Horizontal)...")
+        # --- CHART 1: Current Price Comparison (Horizontal Bar) ---
+        print("\nGenerating Premium Current Price Comparison chart...")
         query_latest = """
         SELECT brand, buy_price, sell_price 
         FROM gold_marts.stg_gold_prices 
@@ -48,93 +46,84 @@ def generate_gold_charts():
         df_latest = pd.read_sql(query_latest, engine)
         
         if not df_latest.empty:
-            plt.figure(figsize=(14, 10))
+            plt.figure(figsize=(16, 10))
             
             # Melt data for side-by-bar comparison
             df_melted = df_latest.melt(id_vars='brand', value_vars=['buy_price', 'sell_price'], 
                                       var_name='Price Type', value_name='Price (VND)')
             
-            # Map "buy_price" to "Buy" and "sell_price" to "Sell"
             df_melted['Price Type'] = df_melted['Price Type'].map({'buy_price': 'Buy', 'sell_price': 'Sell'})
             
-            # Use horizontal bar plot
-            ax = sns.barplot(
-                data=df_melted, 
-                y='brand', 
-                x='Price (VND)', 
-                hue='Price Type', 
-                palette=['#4CAF50', '#F44336'], # Green for Buy, Red for Sell
-                edgecolor=".2"
+            ax1 = sns.barplot(
+                data=df_melted, y='brand', x='Price (VND)', hue='Price Type', 
+                palette=['#2ecc71', '#e74c3c'], edgecolor=".2"
             )
             
-            # Add data labels inside bars
-            for container in ax.containers:
-                ax.bar_label(container, fmt='{:,.0f}', padding=5, fontsize=10, color='black', weight='bold')
+            # Add data labels inside bars in "M" format
+            for container in ax1.containers:
+                ax1.bar_label(container, fmt=lambda x: f'{x/1000:.1f}M', padding=5, weight='bold')
 
-            plt.title('Latest Gold Prices Comparison by Brand', fontsize=20, weight='bold', color='#333')
-            plt.xlabel('Price (Thousand VND / Lượng)', fontsize=14)
+            plt.title('Latest Gold Prices Comparison (Millions VND)', fontsize=22, weight='bold')
+            plt.xlabel('Price (Million VND / Lượng)', fontsize=14)
             plt.ylabel('Gold Brand', fontsize=14)
             
-            # Move legend to the outside right
+            # LEGEND: Move to the right outside the plot
             plt.legend(title='Price Type', bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0.)
             
-            # Format x-axis
-            ax.xaxis.set_major_formatter(FuncFormatter(format_currency))
+            # Format X-axis
+            ax1.xaxis.set_major_formatter(FuncFormatter(format_to_millions))
             
             plt.tight_layout()
-            output_path = os.path.join(output_dir, 'current_brand_comparison.png')
-            plt.savefig(output_path, dpi=300, bbox_inches='tight')
-            print(f"Successfully saved: {output_path}")
-        else:
-            print("No latest data found for current comparison.")
+            output_path_bar = os.path.join(output_dir, 'current_brand_comparison.png')
+            plt.savefig(output_path_bar, dpi=300, bbox_inches='tight')
 
-        # --- CHART 2: Historical Price Trends ---
+        # --- CHART 2: Historical Price Trends (Line Chart) ---
         print("\nGenerating Premium Historical Price Trends chart...")
         query_hourly = "SELECT * FROM gold_marts.fct_gold_prices ORDER BY price_hour"
         df_hourly = pd.read_sql(query_hourly, engine)
         
         if not df_hourly.empty:
-            plt.figure(figsize=(14, 8))
+            df_hourly['price_hour'] = pd.to_datetime(df_hourly['price_hour'])
+            plt.figure(figsize=(16, 9))
             
-            # Use a more vibrant palette for trends
-            num_brands = len(df_hourly['brand'].unique())
-            palette = sns.color_palette("Set1", n_colors=num_brands)
+            # Use high-contrast palette for many brands
+            palette = sns.color_palette("husl", n_colors=len(df_hourly['brand'].unique()))
             
-            # Plot trends for each brand
             ax2 = sns.lineplot(
-                data=df_hourly, 
-                x='price_hour', 
-                y='avg_sell_price', 
-                hue='brand', 
-                marker='o', 
-                markersize=8,
-                linewidth=3,
-                palette=palette
+                data=df_hourly, x='price_hour', y='avg_sell_price', hue='brand', 
+                marker='o', markersize=7, linewidth=3, palette=palette, alpha=0.8
             )
             
-            # Add data labels to line points sparingly (only if meaningful)
-            if len(df_hourly) < 20: # Avoid clutter
-                for line in ax2.lines:
-                    xdata = line.get_xdata()
-                    ydata = line.get_ydata()
-                    for x, y in zip(xdata, ydata):
-                        ax2.annotate(f'{int(y):,}', (x, y), textcoords="offset points", xytext=(0,10), ha='center', fontsize=9, weight='bold')
+            # Y-AXIS ZOOM: Focus on the fluctuation range
+            ymin = df_hourly['avg_sell_price'].min() * 0.995
+            ymax = df_hourly['avg_sell_price'].max() * 1.005
+            plt.ylim(ymin, ymax)
 
-            plt.title('Hourly Gold Sell Price Trends (Average per Hour)', fontsize=20, weight='bold', color='#333')
-            plt.ylabel('Avg Sell Price (Thousand VND / Lượng)', fontsize=14)
-            plt.xlabel('Time (Hourly)', fontsize=14)
-            plt.xticks(rotation=45) # Rotate hourly labels to prevent overlap
+            # DATA LABELS: Label only the last point for each brand
+            for line in ax2.lines:
+                y_coords = line.get_ydata()
+                x_coords = line.get_xdata()
+                if len(y_coords) > 0:
+                    plt.annotate(f'{y_coords[-1]/1000:.1f}M', 
+                                 xy=(x_coords[-1], y_coords[-1]),
+                                 xytext=(8, 0), textcoords='offset points',
+                                 color=line.get_color(), weight='bold', fontsize=10)
+
+            plt.title('Gold Price Fluctuation Trends (Millions VND)', fontsize=22, weight='bold')
+            plt.ylabel('Million VND / Lượng', fontsize=14)
+            plt.xlabel('Time of Observation', fontsize=14)
             
-            # Format y-axis
-            ax2.yaxis.set_major_formatter(FuncFormatter(format_currency))
-            
+            # LEGEND: Move to the right outside the plot
             plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', title='Brand', borderaxespad=0.)
+            
+            # Format Y-axis and rotate X labels
+            ax2.yaxis.set_major_formatter(FuncFormatter(format_to_millions))
+            plt.xticks(rotation=30)
+            
             plt.tight_layout()
             output_path_trend = os.path.join(output_dir, 'historical_price_trends.png')
             plt.savefig(output_path_trend, dpi=300, bbox_inches='tight')
-            print(f"Successfully saved: {output_path_trend}")
-        else:
-            print("No historical data found.")
+            print("Successfully saved all charts.")
 
     except Exception as e:
         print(f"Error generating charts: {e}")
