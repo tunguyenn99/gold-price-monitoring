@@ -76,6 +76,7 @@ gold-price-monitoring/
 │   ├── mongodb/          # MongoDB utilities and configuration
 │   └── utils/            # Analytics and tools (analysis.py & visualize.py)
 ├── data/                 # Local Data Backups (CSV/JSON)
+├── activate_venv.sh      # Activate virtual environment
 └── run_pipeline.sh       # Local Execution Entry point
 ```
 
