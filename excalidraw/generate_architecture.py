@@ -26,14 +26,14 @@ def main():
             "is_container": True
         },
         # Row 1 (Left to Right)
-        {"id": "b1", "x": 100, "y": 150, "text": "24h.com.vn", "color": "#1864ab", "bg": "#d0ebff", "logo": None, "phase": "Source"},
+        {"id": "b1", "x": 100, "y": 150, "text": "24h.com.vn", "color": "#1864ab", "bg": "#d0ebff", "logo": "https://icdn.24h.com.vn/images/2023/logo-24h-new.svg", "phase": "Source"},
         {"id": "b2", "x": 440, "y": 150, "text": "Python Scraper", "color": "#2b8a3e", "bg": "#d3f9d8", "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg", "phase": "Scrape"},
         {"id": "b3", "x": 780, "y": 150, "text": "MongoDB Atlas", "color": "#087f5b", "bg": "#c3fae8", "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg", "phase": "Dump"},
         {"id": "b4", "x": 1120, "y": 150, "text": "dlt (Ingest)", "color": "#5f3dc4", "bg": "#e5dbff", "logo": "https://raw.githubusercontent.com/dlt-hub/dlt/devel/docs/website/static/img/dlt-logo.svg", "phase": "Extract"},
         
         # Row 2 (Right to Left)
         {"id": "b5", "x": 1120, "y": 350, "text": "Supabase\n(Postgres)", "color": "#0b7285", "bg": "#c5f6fa", "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg", "phase": "Load"},
-        {"id": "b6", "x": 780, "y": 350, "text": "dbt (Transform)", "color": "#e8590c", "bg": "#ffe8cc", "logo": "https://raw.githubusercontent.com/dbt-labs/dbt-core/main/core/dbt/include/global_project/macros/materializations/models/docs/favicon.png", "phase": "Transform"},
+        {"id": "b6", "x": 780, "y": 350, "text": "dbt (Transform)", "color": "#e8590c", "bg": "#ffe8cc", "logo": "https://vectorseek.com/wp-content/uploads/2023/09/Dbt-Logo-Vector.svg-.png", "phase": "Transform"},
         {"id": "b7", "x": 440, "y": 350, "text": "Python\nAnalytics & Charts", "color": "#2b8a3e", "bg": "#d3f9d8", "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg", "phase": "Usage"},
     ]
 
