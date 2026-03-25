@@ -1,5 +1,16 @@
 # 📈 Vietnam Gold Price Monitor — Modern Data Stack
 
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-E9431F?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![dbt](https://img.shields.io/badge/dbt-FF694B?style=for-the-badge&logo=dbt&logoColor=white)](https://www.getdbt.com/)
+[![dlt](https://img.shields.io/badge/dlt-FFDC00?style=for-the-badge&logo=python&logoColor=black)](https://dlthub.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/features/actions)
+[![uv](https://img.shields.io/badge/uv-5D2DE2?style=for-the-badge&logo=python&logoColor=white)](https://github.com/astral-sh/uv)
+
+---
+
 A professional, end-to-end data pipeline for monitoring and analyzing gold price trends in Vietnam. This project implements a **Modern Data Stack (MDS)** architecture to scrape, ingest, transform, and visualize gold prices automatically every 2 hours.
 
 ---
