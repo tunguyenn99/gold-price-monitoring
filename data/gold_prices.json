@@ -1,51 +1,5 @@
 [
     {
-        "timestamp": "2026-04-09 14:56:53",
-        "date": "2026-04-09",
-        "entries": [
-            {
-                "brand": "SJC",
-                "buy": 168500,
-                "sell": 171500
-            },
-            {
-                "brand": "DOJI HN",
-                "buy": 168500,
-                "sell": 171500
-            },
-            {
-                "brand": "DOJI SG",
-                "buy": 168500,
-                "sell": 171500
-            },
-            {
-                "brand": "BTMH",
-                "buy": 167500,
-                "sell": 171500
-            },
-            {
-                "brand": "BTMC SJC",
-                "buy": 168500,
-                "sell": 171500
-            },
-            {
-                "brand": "Phú Qúy SJC",
-                "buy": 168300,
-                "sell": 171500
-            },
-            {
-                "brand": "PNJ TP.HCM",
-                "buy": 168000,
-                "sell": 171000
-            },
-            {
-                "brand": "PNJ Hà Nội",
-                "buy": 168000,
-                "sell": 171000
-            }
-        ]
-    },
-    {
         "timestamp": "2026-04-10 04:09:19",
         "date": "2026-04-10",
         "entries": [
@@ -16976,6 +16930,57 @@
                 "brand": "PNJ Hà Nội",
                 "buy": 136200,
                 "sell": 141200
+            }
+        ]
+    },
+    {
+        "timestamp": "2026-07-29 04:13:40",
+        "date": "2026-07-29",
+        "entries": [
+            {
+                "brand": "SJC",
+                "buy": 136500,
+                "sell": 140500
+            },
+            {
+                "brand": "DOJI HN",
+                "buy": 136500,
+                "sell": 140500
+            },
+            {
+                "brand": "DOJI SG",
+                "buy": 136500,
+                "sell": 140500
+            },
+            {
+                "brand": "BTMH",
+                "buy": 137100,
+                "sell": 141000
+            },
+            {
+                "brand": "BTMC VRTL",
+                "buy": 137100,
+                "sell": 141000
+            },
+            {
+                "brand": "BTMC SJC",
+                "buy": 136500,
+                "sell": 140500
+            },
+            {
+                "brand": "Phú Qúy SJC",
+                "buy": 136500,
+                "sell": 140500
+            },
+            {
+                "brand": "PNJ TP.HCM",
+                "buy": 135400,
+                "sell": 140400
+            },
+            {
+                "brand": "PNJ Hà Nội",
+                "buy": 135400,
+                "sell": 140400
             }
         ]
     }
